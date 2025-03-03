@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,26 +18,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cowrywisetest.MainActivity
 import com.example.cowrywisetest.ui.theme.CowryWiseCustomColorsPalette
 import com.example.cowrywisetest.ui.widget.CowryWiseTextInputField
 
 @Composable
-fun BaseCurrencyTextInputField(
-    currency: String,
+fun MainActivity.BaseCurrencyTextInputField(
     onValueChanged: (value: String) -> Unit
 ) {
     var baseInputText by remember { mutableStateOf("") }
+
+    val baseCurrencySymbol = viewModel.baseCurrencySymbol.collectAsState()
+
     CowryWiseTextInputField(
         onValueChange = {
             baseInputText = it
             onValueChanged(it)
+            val amount = baseInputText.toDoubleOrNull()
+            if (amount != null) {
+                viewModel.convertCurrency(amount)
+            }
         },
         value = baseInputText,
         labelText = "0.0",
         labelTextColor = CowryWiseCustomColorsPalette.hintColor,
         trailingContent = {
             Text(
-                currency,
+                baseCurrencySymbol.value,
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontFamily = FontFamily.Default,
                     color = CowryWiseCustomColorsPalette.hintColor,

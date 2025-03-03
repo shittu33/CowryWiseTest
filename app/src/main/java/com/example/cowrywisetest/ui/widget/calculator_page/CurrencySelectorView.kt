@@ -96,9 +96,11 @@ fun MainActivity.CurrencySelectorView(
     }
 
     LaunchedEffect(selectedBaseCurrency) {
+        viewModel.setBaseCurrencySymbol(selectedBaseCurrency.code)
         onBaseCurrencySelected(selectedBaseCurrency.code)
     }
     LaunchedEffect(selectedTargetCurrency) {
+        viewModel.setTargetCurrencySymbol(selectedTargetCurrency.code)
         onTargetCurrencySelected(selectedTargetCurrency.code)
     }
 

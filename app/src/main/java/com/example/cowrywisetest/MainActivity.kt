@@ -57,9 +57,12 @@ import com.example.cowrywisetest.ui.theme.CowryWiseTestTheme
 import com.example.cowrywisetest.ui.theme.LightWhiteColor
 import com.example.cowrywisetest.ui.widget.calculator_page.CowryWiseAppBar
 import com.example.cowrywisetest.ui.widget.calculator_page.BaseCurrencyTextInputField
+import com.example.cowrywisetest.ui.widget.calculator_page.ConvertButton
 import com.example.cowrywisetest.ui.widget.calculator_page.CurrencyConverterTittleView
 import com.example.cowrywisetest.ui.widget.calculator_page.CurrencySelectorView
+import com.example.cowrywisetest.ui.widget.calculator_page.RateInfoView
 import com.example.cowrywisetest.ui.widget.calculator_page.TargetCurrencyInputField
+import com.example.cowrywisetest.utils.CurrencyConverter
 import com.example.cowrywisetest.utils.NetworkResult
 import com.example.cowrywisetest.viewModel.CurrencyConverterViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,10 +92,6 @@ class MainActivity : FragmentActivity() {
 
         var baseAmountInputText by remember { mutableStateOf("") }
         var targetAmountInputText by remember { mutableStateOf("") }
-
-
-        var baseCurrencySymbol by remember { mutableStateOf(DEFAULT_BASE_CURRENCY) }
-        var targetCurrencySymbol by remember { mutableStateOf(DEFAULT_TARGET_CURRENCY) }
 
 
         LaunchedEffect(Unit) {
@@ -126,22 +125,25 @@ class MainActivity : FragmentActivity() {
                 Spacer(Modifier.height(65.dp))
                 CurrencyConverterTittleView()
                 Spacer(Modifier.height(55.dp))
-                BaseCurrencyTextInputField(currency = baseCurrencySymbol) {
+                BaseCurrencyTextInputField {
                     baseAmountInputText = it
                 }
                 Spacer(Modifier.height(15.dp))
-                TargetCurrencyInputField(currency = targetCurrencySymbol) {
+                TargetCurrencyInputField {
                     targetAmountInputText = it
                 }
                 Spacer(Modifier.height(35.dp))
                 CurrencySelectorView(onBaseCurrencySelected = {
-                    baseCurrencySymbol = it
+//                    baseCurrencySymbol = it
                 }, onTargetCurrencySelected = {
-                    targetCurrencySymbol = it
+//                    targetCurrencySymbol = it
                 })
                 Spacer(Modifier.height(35.dp))
                 ConvertButton(populateDbProgress, onClick = {
-
+                    val amount = baseAmountInputText.toDoubleOrNull()
+                    if (amount != null) {
+                        viewModel.convertCurrency(amount)
+                    }
                 })
                 Spacer(Modifier.height(35.dp))
                 RateInfoView(accentColor)
@@ -161,77 +163,6 @@ class MainActivity : FragmentActivity() {
 
         }
     }
-
-    @Composable
-    private fun ColumnScope.RateInfoView(accentColor: Color) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
-        ) {
-            Spacer(Modifier.weight(1f))
-            Text(
-                "Mid-market exchange rate at 13:38 UTC",
-                maxLines = 1,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontFamily = FontFamily.Default,
-                    color = accentColor,
-                    fontWeight = FontWeight.W500,
-                    letterSpacing = 0.5.sp, fontSize = 15.sp
-                ),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    //                        .fillMaxWidth()
-                    .padding(end = 12.dp)
-                    .drawBehind {
-                        val strokeWidthPx = 1.dp.toPx()
-                        val verticalOffset = size.height - 2.sp.toPx()
-                        drawLine(
-                            color = accentColor,
-                            strokeWidth = strokeWidthPx,
-                            start = Offset(0f, verticalOffset),
-                            end = Offset(size.width, verticalOffset)
-                        )
-                    }
-            )
-            Image(
-                painter = painterResource(R.drawable.ic_info),
-                contentDescription = "info",
-                alignment = Alignment.TopStart,
-                modifier = Modifier
-                    .weight(1f)
-                    .size(22.dp),
-                contentScale = ContentScale.Fit, colorFilter = ColorFilter.tint(
-                    CowryWiseCustomColorsPalette.hintColor)
-            )
-//            Spacer(Modifier
-//                .weight(1f)
-//            )
-
-        }
-    }
-
-    @Composable
-    private fun ConvertButton(
-        populateDbProgress: NetworkResult<String>?,
-        onClick: () -> Unit
-    ) {
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
-            shape = RoundedCornerShape(8.dp),
-            enabled = populateDbProgress is NetworkResult.Success,
-            colors = ButtonDefaults.buttonColors(containerColor = CowryWiseCustomColorsPalette.successButtonColor1),
-            onClick = onClick
-        ) {
-            Text(
-                "Convert",
-                style = MaterialTheme.typography.titleMedium.copy(color = LightWhiteColor)
-            )
-        }
-    }
-
 
     @Preview(showBackground = true)
     @Composable
