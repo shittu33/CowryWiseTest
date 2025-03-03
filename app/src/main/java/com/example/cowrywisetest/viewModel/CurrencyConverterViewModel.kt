@@ -2,18 +2,19 @@ package com.example.cowrywisetest.viewModel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import com.example.cowrywisetest.models.SupportedSymbolsResponseModel
 import com.example.cowrywisetest.repositories.CurrencyRepository
 import com.example.cowrywisetest.utils.CalendarWrapper
 import com.example.cowrywisetest.utils.DateUtil
 import com.example.cowrywisetest.utils.Event
 import com.example.cowrywisetest.utils.NetworkResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
+@HiltViewModel
 class CurrencyConverterViewModel @Inject constructor(
     private val currencyRepository: CurrencyRepository
 ) : ViewModel() {
@@ -27,6 +28,7 @@ class CurrencyConverterViewModel @Inject constructor(
         MutableLiveData<Event<NetworkResult<String>>>()
     val populateRatesDbLiveData
         get() = _populateRatesDbLiveData
+
 
 
     private val _historicalRatesLiveData =
