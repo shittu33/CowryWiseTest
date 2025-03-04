@@ -1,6 +1,7 @@
 package com.example.cowrywisetest.ui.widget.calculator_page
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,11 +28,12 @@ import com.example.cowrywisetest.R
 import com.example.cowrywisetest.ui.theme.CowryWiseCustomColorsPalette
 
 @Composable
-fun ColumnScope.RateInfoView(accentColor: Color) {
+fun ColumnScope.RateInfoButton(accentColor: Color, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
             .align(Alignment.CenterHorizontally)
+            .clickable { onClick() }
     ) {
         Spacer(Modifier.weight(1f))
         Text(

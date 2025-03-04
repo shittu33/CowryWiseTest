@@ -9,8 +9,6 @@ import com.example.cowrywisetest.mock_data.mockSymbolResponseBody
 import com.example.cowrywisetest.models.LatestRateResponseModel
 import com.example.cowrywisetest.models.SupportedSymbolsResponseModel
 import com.example.cowrywisetest.repositories.CurrencyRepository
-import com.example.cowrywisetest.utils.CalendarWrapper
-import com.example.cowrywisetest.utils.DateUtil
 import com.example.cowrywisetest.utils.Event
 import com.example.cowrywisetest.utils.NetworkResult
 import com.example.cowrywisetest.viewModel.CurrencyConverterViewModel
@@ -33,7 +31,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import retrofit2.Response
-import java.util.Calendar
 
 @ExperimentalCoroutinesApi
 class CurrencyConverterViewModelTest {
@@ -126,7 +123,7 @@ class CurrencyConverterViewModelTest {
         val progressObserver = mock(Observer::class.java) as Observer<Event<NetworkResult<String>>>
         val ratesObserver = mock(Observer::class.java) as Observer<Map<String, Double>>
         viewModel.historicalProgressLiveData.observeForever(progressObserver)
-        viewModel.historicalRatesLiveData.observeForever(ratesObserver)
+        viewModel.historicalRatesFlow.observeForever(ratesObserver)
 
 
         // 3. Call the method under test
