@@ -36,7 +36,8 @@ fun MainActivity.CowryWiseAppBar() {
             Modifier
                 .size(45.dp)
                 .clickable(role = Role.Button) {
-                    Toast.makeText(this@CowryWiseAppBar,"Coming soon...",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@CowryWiseAppBar, "Coming soon...", Toast.LENGTH_SHORT)
+                        .show()
                 }
         )
         Spacer(Modifier.weight(1f))
@@ -49,7 +50,14 @@ fun MainActivity.CowryWiseAppBar() {
                 contentColor = CowryWiseCustomColorsPalette.successButtonColor1
             )
         ) {
-            Text("Sign up", style = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp, fontWeight = FontWeight.W600, letterSpacing = 0.5.sp))
+            Text(
+                "Sign up",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.W600,
+                    letterSpacing = 0.5.sp
+                )
+            )
         }
     }
 }

@@ -20,7 +20,8 @@ import java.util.Collections
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLProtocolException
 
-private const val FIXER_API_KEY = "bc6fa6dfaf9dc776ea75a20482ecb4e8"
+//private const val FIXER_API_KEY = "bc6fa6dfaf9dc776ea75a20482ecb4e8"
+private const val FIXER_API_KEY = "4e70297f4330405a5a9d7b68000d3343"
 
 object RetrofitBuilder {
     private var retrofit: Retrofit? = null

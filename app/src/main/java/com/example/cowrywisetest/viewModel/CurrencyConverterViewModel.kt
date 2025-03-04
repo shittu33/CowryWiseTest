@@ -1,9 +1,5 @@
 package com.example.cowrywisetest.viewModel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -38,10 +34,10 @@ class CurrencyConverterViewModel @Inject constructor(
         get() = _populateRatesDbLiveData
 
 
-    private val _historicalRatesLiveData =
-        MutableLiveData<Map<String, Double>>()
-    val historicalRatesLiveData
-        get() = _historicalRatesLiveData
+    private val _historicalRatesFlow =
+        MutableStateFlow<Map<String, Double>?>(null)
+    val historicalRatesFlow
+        get() = _historicalRatesFlow
 
 
     private val _historicalProgressLiveData =
@@ -64,16 +60,13 @@ class CurrencyConverterViewModel @Inject constructor(
     val targetCurrencySymbol
         get() = _targetCurrencySymbol
 
-    fun setBaseCurrencySymbol(newSymbol:String){
+    fun setBaseCurrencySymbol(newSymbol: String) {
         _baseCurrencySymbol.value = newSymbol
     }
 
-    fun setTargetCurrencySymbol(newSymbol:String){
+    fun setTargetCurrencySymbol(newSymbol: String) {
         _targetCurrencySymbol.value = newSymbol
     }
-
-
-
 
 
     suspend fun getCurrencySymbols() {
@@ -98,28 +91,36 @@ class CurrencyConverterViewModel @Inject constructor(
         }
     }
 
-    suspend fun getLastDaysCurrencyData(
+    fun getLastDaysCurrencyData(
         calendarWrapper: CalendarWrapper = CalendarWrapper(),
-        symbol: String
     ) {
         _historicalProgressLiveData.postValue(Event(NetworkResult.Loading))
-        val noOfDayBack = 10
-        DateUtil.getBackDateRange(calendarWrapper, noOfDayBack).mapIndexed { index, date ->
-            currencyRepository.getHistoricalRates(date, symbol).collect {
-                if (it is NetworkResult.Success) {
-                    if (index == 0) {
-                        _historicalRatesLiveData.value = emptyMap()
+        viewModelScope.launch {
+            val noOfDayBack = 1
+            DateUtil.getBackDateRange(calendarWrapper, noOfDayBack).mapIndexed { index, date ->
+                val symbol = _targetCurrencySymbol.value
+                currencyRepository.getHistoricalRates(date, symbol).collect {
+                    if (it is NetworkResult.Success) {
+                        if (index == 0) {
+                            _historicalRatesFlow.value = emptyMap()
+                        }
+                        val rate = it.data.rates[symbol]
+                        if (rate != null) {
+                            _historicalRatesFlow.value?.toMutableMap()?.set(date, rate)
+                            _historicalRatesFlow.value = _historicalRatesFlow.value
+                        }
+                        if (index == noOfDayBack - 1) {
+                            _historicalProgressLiveData.postValue(Event(NetworkResult.Success("Success")))
+                        }
+                    } else {
+                        _historicalProgressLiveData.postValue(
+                            Event(
+                                NetworkResult.Error.ApiError(
+                                    message = it.toString()
+                                )
+                            )
+                        )
                     }
-                    val rate = it.data.rates[symbol]
-                    if (rate != null) {
-                        _historicalRatesLiveData.value?.toMutableMap()?.set(date, rate)
-                        _historicalRatesLiveData.postValue(_historicalRatesLiveData.value)
-                    }
-                    if (index == noOfDayBack - 1) {
-                        _historicalProgressLiveData.postValue(Event(NetworkResult.Success("Success")))
-                    }
-                } else {
-                    _historicalProgressLiveData.postValue(Event(NetworkResult.Error.ApiError(message = it.toString())))
                 }
             }
         }
